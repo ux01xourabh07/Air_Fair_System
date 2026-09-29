@@ -8,6 +8,9 @@ import History from './pages/History';
 import RouteExplorer from './pages/RouteExplorer';
 import SeasonalTrends from './pages/SeasonalTrends';
 import Reports from './pages/Reports';
+import EconomicImpact from './pages/EconomicImpact';
+import ShockPropagation from './pages/ShockPropagation';
+import AnomalyDetection from './pages/AnomalyDetection';
 
 export function App() {
   return (
@@ -25,6 +28,11 @@ export function App() {
           <Route path="forecast" element={<MarketForecast />} />
           <Route path="reports" element={<Reports />} />
           <Route path="history" element={<History />} />
+
+          {/* Intelligence Pages */}
+          <Route path="economic-impact" element={<EconomicImpact />} />
+          <Route path="shock-propagation" element={<ShockPropagation />} />
+          <Route path="anomaly-detection" element={<AnomalyDetection />} />
           
           {/* Fallback route */}
           <Route path="*" element={<Navigate to="/dashboard" replace />} />

@@ -12,46 +12,73 @@ import {
   HelpCircle,
   LogOut,
   X,
+  DollarSign,
+  Activity,
+  AlertTriangle,
 } from 'lucide-react';
 
 export const Sidebar = ({ isOpen, onClose, onOpenSettings, onLogout }) => {
-  const navItems = [
-    {
-      name: 'Dashboard',
-      to: '/dashboard',
-      icon: LayoutDashboard,
-    },
-    {
-      name: 'Route Explorer',
-      to: '/route-explorer',
-      icon: Search,
-    },
-    {
-      name: 'Airline Analysis',
-      to: '/airlines',
-      icon: BarChart2,
-    },
-    {
-      name: 'Seasonal Trends',
-      to: '/seasonal-trends',
-      icon: Calendar,
-    },
-    {
-      name: 'Forecast',
-      to: '/forecast',
-      icon: TrendingUp,
-    },
-    {
-      name: 'Reports',
-      to: '/reports',
-      icon: FileText,
-    },
-    {
-      name: 'History',
-      to: '/history',
-      icon: Clock,
-    },
+  // MAIN section
+  const mainNavItems = [
+    { name: 'Dashboard', to: '/dashboard', icon: LayoutDashboard },
+    { name: 'Route Explorer', to: '/route-explorer', icon: Search },
+    { name: 'Airline Analysis', to: '/airlines', icon: BarChart2 },
+    { name: 'Seasonal Trends', to: '/seasonal-trends', icon: Calendar },
+    { name: 'Forecast', to: '/forecast', icon: TrendingUp },
+    { name: 'Reports', to: '/reports', icon: FileText },
   ];
+
+  // INTELLIGENCE section
+  const intelligenceNavItems = [
+    { name: 'Economic Impact', to: '/economic-impact', icon: DollarSign },
+    { name: 'Shock Propagation', to: '/shock-propagation', icon: Activity },
+    { name: 'Anomaly Detection', to: '/anomaly-detection', icon: AlertTriangle },
+  ];
+
+  // ACCOUNT section
+  const accountNavItems = [
+    { name: 'History', to: '/history', icon: Clock },
+  ];
+
+  const navLinkClass = ({ isActive }) =>
+    `flex items-center gap-3.5 px-4 py-2.5 rounded-2xl text-sm font-medium transition-all ${
+      isActive
+        ? 'bg-[#e8f7f5] text-[#0fa497] font-semibold'
+        : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50/80'
+    }`;
+
+  const renderNavItem = (item) => {
+    const Icon = item.icon;
+    return (
+      <NavLink
+        key={item.to}
+        to={item.to}
+        onClick={() => {
+          if (window.innerWidth < 1024) onClose();
+        }}
+        className={navLinkClass}
+      >
+        {({ isActive }) => (
+          <>
+            <Icon
+              className={`w-4 h-4 transition-colors ${
+                isActive ? 'text-[#0fa497]' : 'text-slate-500'
+              }`}
+            />
+            <span>{item.name}</span>
+          </>
+        )}
+      </NavLink>
+    );
+  };
+
+  const sectionLabel = (text) => (
+    <div className="px-4 pt-4 pb-1.5">
+      <span className="text-[10px] font-bold text-slate-400 tracking-wider uppercase">
+        {text}
+      </span>
+    </div>
+  );
 
   return (
     <>
@@ -70,7 +97,7 @@ export const Sidebar = ({ isOpen, onClose, onOpenSettings, onLogout }) => {
         }`}
       >
         {/* Top Header & Logo */}
-        <div>
+        <div className="overflow-y-auto flex-1">
           <div className="h-20 flex items-center justify-between px-6">
             <div className="flex items-center gap-3">
               {/* Airplane Logo Icon */}
@@ -92,7 +119,7 @@ export const Sidebar = ({ isOpen, onClose, onOpenSettings, onLogout }) => {
                   Airfare Intelligence
                 </div>
                 <div className="text-xs text-slate-400 font-normal">
-                  India's Airfare Index
+                  Smarter Skies, Better Insights
                 </div>
               </div>
             </div>
@@ -106,45 +133,30 @@ export const Sidebar = ({ isOpen, onClose, onOpenSettings, onLogout }) => {
             </button>
           </div>
 
-          {/* Navigation Links */}
-          <div className="px-4 py-3">
-            <nav className="space-y-1">
-              {navItems.map((item) => {
-                const Icon = item.icon;
-                return (
-                  <NavLink
-                    key={item.to}
-                    to={item.to}
-                    onClick={() => {
-                      if (window.innerWidth < 1024) onClose();
-                    }}
-                    className={({ isActive }) =>
-                      `flex items-center gap-3.5 px-4 py-2.5 rounded-2xl text-sm font-medium transition-all ${
-                        isActive
-                          ? 'bg-[#e8f7f5] text-[#0fa497] font-semibold'
-                          : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50/80'
-                      }`
-                    }
-                  >
-                    {({ isActive }) => (
-                      <>
-                        <Icon
-                          className={`w-4 h-4 transition-colors ${
-                            isActive ? 'text-[#0fa497]' : 'text-slate-500'
-                          }`}
-                        />
-                        <span>{item.name}</span>
-                      </>
-                    )}
-                  </NavLink>
-                );
-              })}
+          {/* Navigation */}
+          <div className="px-4 pb-3">
+            {/* MAIN section */}
+            {sectionLabel('Main')}
+            <nav className="space-y-0.5">
+              {mainNavItems.map(renderNavItem)}
+            </nav>
+
+            {/* INTELLIGENCE section */}
+            {sectionLabel('Intelligence')}
+            <nav className="space-y-0.5">
+              {intelligenceNavItems.map(renderNavItem)}
+            </nav>
+
+            {/* ACCOUNT section */}
+            {sectionLabel('Account')}
+            <nav className="space-y-0.5">
+              {accountNavItems.map(renderNavItem)}
             </nav>
           </div>
         </div>
 
         {/* Bottom Section */}
-        <div className="p-4 space-y-1">
+        <div className="p-4 border-t border-[#eef2f6] space-y-1">
           <button
             onClick={onOpenSettings}
             className="w-full flex items-center gap-3.5 px-4 py-2 rounded-xl text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-colors"

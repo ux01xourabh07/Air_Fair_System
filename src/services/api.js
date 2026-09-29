@@ -30,6 +30,24 @@ import {
   latestReportData,
   reportTypesCards,
 } from '../data/reports';
+import {
+  economicIndicators,
+  economicVsAirfareChart,
+  routeLagAnalysis,
+  economicInsights,
+  economicFareInvestigation,
+  shockEvents,
+  shockOverview,
+  propagationTimeline,
+  shockStats,
+  shockRouteResponse,
+  shockOverallMovement,
+  anomalyOverview,
+  anomalyClassifications,
+  anomalyRecords,
+  anomalyFareInvestigation,
+  recentIntelligenceSignals,
+} from '../data/intelligence';
 
 const delay = (ms = 100) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -126,4 +144,50 @@ export default {
   getRouteExplorerData,
   getSeasonalTrendsData,
   getReportsData,
+  getEconomicImpactData,
+  getShockPropagationData,
+  getAnomalyDetectionData,
+};
+
+/**
+ * Fetch Economic Impact Analysis data
+ */
+export const getEconomicImpactData = async () => {
+  await delay();
+  return {
+    indicators: economicIndicators,
+    chart: economicVsAirfareChart,
+    routeLag: routeLagAnalysis,
+    insights: economicInsights,
+    fareInvestigation: economicFareInvestigation,
+  };
+};
+
+/**
+ * Fetch Shock Propagation data
+ */
+export const getShockPropagationData = async () => {
+  await delay();
+  return {
+    events: shockEvents,
+    overview: shockOverview,
+    timeline: propagationTimeline,
+    stats: shockStats,
+    routeResponse: shockRouteResponse,
+    overallMovement: shockOverallMovement,
+  };
+};
+
+/**
+ * Fetch Anomaly Detection data
+ */
+export const getAnomalyDetectionData = async () => {
+  await delay();
+  return {
+    overview: anomalyOverview,
+    classifications: anomalyClassifications,
+    records: anomalyRecords,
+    fareInvestigation: anomalyFareInvestigation,
+    signals: recentIntelligenceSignals,
+  };
 };

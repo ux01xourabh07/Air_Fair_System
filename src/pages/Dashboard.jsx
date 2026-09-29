@@ -13,6 +13,10 @@ import {
   Calendar,
   Search,
   ArrowLeftRight,
+  DollarSign,
+  Activity,
+  Shield,
+  BarChart2,
 } from 'lucide-react';
 import {
   ResponsiveContainer,
@@ -35,6 +39,12 @@ import {
   topAirlinePricing,
   monthlyFareTrends,
 } from '../data/indexData';
+import {
+  economicDashboardSummary,
+  anomalyDashboardSummary,
+  shockDashboardSummary,
+  recentIntelligenceSignals,
+} from '../data/intelligence';
 
 export const Dashboard = () => {
   const navigate = useNavigate();
@@ -176,6 +186,121 @@ export const Dashboard = () => {
           <div className="text-[11px] text-slate-400 mt-0.5">
             {dashboardOverview.lastUpdatedTime}
           </div>
+        </div>
+      </div>
+
+      {/* Intelligence Summary Row — Economic Impact, Anomaly Detection, Shock Propagation */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {/* Economic Impact Card */}
+        <div className="bg-white rounded-2xl p-4 border border-[#eef2f6] shadow-xs">
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-2">
+              <div className="w-7 h-7 rounded-full bg-[#e8f7f5] flex items-center justify-center">
+                <DollarSign className="w-3.5 h-3.5 text-[#0fa497]" />
+              </div>
+              <span className="text-sm font-bold text-slate-800">Economic Impact</span>
+            </div>
+            <span className="text-[11px] font-semibold text-[#0fa497] bg-[#e8f7f5] px-2 py-0.5 rounded-full">
+              +{economicDashboardSummary.airfareResponse}
+            </span>
+          </div>
+          <div className="grid grid-cols-3 gap-2 mb-3">
+            <div>
+              <div className="text-[10px] text-slate-400">ATF Increase</div>
+              <div className="text-sm font-bold text-slate-900">{economicDashboardSummary.atfChange}</div>
+            </div>
+            <div>
+              <div className="text-[10px] text-slate-400">Airfare Response</div>
+              <div className="text-sm font-bold text-slate-900">{economicDashboardSummary.airfareResponse}</div>
+            </div>
+            <div>
+              <div className="text-[10px] text-slate-400">Observed Lag</div>
+              <div className="text-sm font-bold text-slate-900">{economicDashboardSummary.observedLag}</div>
+            </div>
+          </div>
+          <p className="text-[11px] text-slate-500 mb-3">{economicDashboardSummary.note}</p>
+          <button
+            onClick={() => navigate('/economic-impact')}
+            className="flex items-center gap-1 text-[11px] font-semibold text-[#0fa497] hover:underline"
+          >
+            View Analysis <ArrowRight className="w-3 h-3" />
+          </button>
+        </div>
+
+        {/* Anomaly Detection Card */}
+        <div className="bg-white rounded-2xl p-4 border border-[#eef2f6] shadow-xs">
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-2">
+              <div className="w-7 h-7 rounded-full bg-rose-50 flex items-center justify-center">
+                <AlertTriangle className="w-3.5 h-3.5 text-rose-500" />
+              </div>
+              <span className="text-sm font-bold text-slate-800">Anomaly Detection</span>
+            </div>
+            <span className="text-[11px] font-semibold text-rose-600 bg-rose-50 px-2 py-0.5 rounded-full border border-rose-100">
+              {anomalyDashboardSummary.unusualMovements} signals
+            </span>
+          </div>
+          <div className="text-base font-bold text-slate-900 mb-2">
+            {anomalyDashboardSummary.unusualMovements} unusual movements
+          </div>
+          <div className="flex items-center gap-3 mb-3 flex-wrap">
+            <span className="flex items-center gap-1 text-[11px] text-slate-500">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 inline-block" />
+              {anomalyDashboardSummary.normalCount} Normal
+            </span>
+            <span className="flex items-center gap-1 text-[11px] text-amber-600">
+              <span className="w-2 h-2 rounded-full bg-amber-400 inline-block" />
+              {anomalyDashboardSummary.possibleDataAnomalies} Data Anomalies
+            </span>
+            <span className="flex items-center gap-1 text-[11px] text-rose-600">
+              <span className="w-2 h-2 rounded-full bg-rose-400 inline-block" />
+              {anomalyDashboardSummary.possibleMarketShocks} Market Shocks
+            </span>
+          </div>
+          <p className="text-[11px] text-slate-500 mb-3">{anomalyDashboardSummary.note}</p>
+          <button
+            onClick={() => navigate('/anomaly-detection')}
+            className="flex items-center gap-1 text-[11px] font-semibold text-[#0fa497] hover:underline"
+          >
+            View Detection <ArrowRight className="w-3 h-3" />
+          </button>
+        </div>
+
+        {/* Shock Propagation Card */}
+        <div className="bg-white rounded-2xl p-4 border border-[#eef2f6] shadow-xs">
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-2">
+              <div className="w-7 h-7 rounded-full bg-purple-50 flex items-center justify-center">
+                <Activity className="w-3.5 h-3.5 text-purple-500" />
+              </div>
+              <span className="text-sm font-bold text-slate-800">Shock Propagation</span>
+            </div>
+            <span className="text-[11px] font-semibold text-purple-700 bg-purple-50 px-2 py-0.5 rounded-full border border-purple-100">
+              Latest Event
+            </span>
+          </div>
+          <div className="text-sm font-bold text-slate-900 mb-3">{shockDashboardSummary.latestShock}</div>
+          <div className="grid grid-cols-3 gap-2 mb-3">
+            <div>
+              <div className="text-[10px] text-slate-400">First Response</div>
+              <div className="text-sm font-bold text-slate-900">{shockDashboardSummary.firstAffectedRoute}</div>
+            </div>
+            <div>
+              <div className="text-[10px] text-slate-400">Fastest Lag</div>
+              <div className="text-sm font-bold text-slate-900">{shockDashboardSummary.observedLag}</div>
+            </div>
+            <div>
+              <div className="text-[10px] text-slate-400">Index Response</div>
+              <div className="text-sm font-bold text-[#0fa497]">{shockDashboardSummary.nationalIndexResponse}</div>
+            </div>
+          </div>
+          <p className="text-[11px] text-slate-500 mb-3">Route-level movements preceded the broader index response.</p>
+          <button
+            onClick={() => navigate('/shock-propagation')}
+            className="flex items-center gap-1 text-[11px] font-semibold text-[#0fa497] hover:underline"
+          >
+            View Propagation <ArrowRight className="w-3 h-3" />
+          </button>
         </div>
       </div>
 
@@ -514,6 +639,111 @@ export const Dashboard = () => {
                 </span>
               </div>
             </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Recent Intelligence Signals + Current Market Signal */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
+        {/* Recent Intelligence Signals */}
+        <div className="lg:col-span-7 bg-white rounded-2xl p-5 border border-[#eef2f6] shadow-xs">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <AlertTriangle className="w-4 h-4 text-[#0fa497]" />
+              <h3 className="text-base font-bold text-slate-900 tracking-tight">
+                Recent Intelligence Signals
+              </h3>
+            </div>
+            <button
+              onClick={() => navigate('/anomaly-detection')}
+              className="text-xs text-slate-400 hover:text-slate-600 font-medium flex items-center gap-0.5"
+            >
+              View all <ArrowRight className="w-3.5 h-3.5" />
+            </button>
+          </div>
+          <div className="space-y-0 divide-y divide-slate-50">
+            {recentIntelligenceSignals.map((sig) => {
+              const iconColor = {
+                red: 'text-rose-500',
+                teal: 'text-[#0fa497]',
+                amber: 'text-amber-500',
+                slate: 'text-slate-400',
+              }[sig.typeColor] || 'text-slate-400';
+              const severityClass = {
+                red: 'bg-rose-50 text-rose-600 border border-rose-100',
+                teal: 'bg-[#e8f7f5] text-[#0fa497] border border-[#c8ede9]',
+                amber: 'bg-amber-50 text-amber-700 border border-amber-100',
+                slate: 'bg-slate-100 text-slate-500',
+              }[sig.severityColor] || 'bg-slate-100 text-slate-500';
+              return (
+                <div
+                  key={sig.id}
+                  className="flex items-center gap-3 py-3 hover:bg-slate-50/50 transition-colors -mx-5 px-5"
+                >
+                  <AlertTriangle className={`w-4 h-4 ${iconColor} shrink-0`} />
+                  <div className="flex-1 min-w-0">
+                    <span className={`text-[11px] font-semibold ${iconColor}`}>
+                      {sig.type}
+                    </span>
+                    <span className="text-[11px] text-slate-500 ml-2">
+                      {sig.description}
+                    </span>
+                  </div>
+                  <span className="text-[11px] text-slate-400 shrink-0">{sig.time}</span>
+                  <span
+                    className={`inline-block px-2 py-0.5 rounded-full text-[10px] font-medium shrink-0 ${severityClass}`}
+                  >
+                    {sig.severity}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Current Market Signal (Shock Propagation) */}
+        <div className="lg:col-span-5 bg-white rounded-2xl p-5 border border-[#eef2f6] shadow-xs flex flex-col justify-between">
+          <div>
+            <div className="flex items-center gap-2 mb-4">
+              <Activity className="w-4 h-4 text-[#0fa497]" />
+              <h3 className="text-base font-bold text-slate-900 tracking-tight">
+                Current Market Signal
+              </h3>
+            </div>
+            {/* Signal flow */}
+            <div className="flex items-center gap-2 mb-4 flex-wrap">
+              <div className="bg-slate-50 rounded-xl px-3 py-2 text-xs font-medium text-slate-700 border border-slate-100 flex items-center gap-1.5">
+                <DollarSign className="w-3.5 h-3.5 text-[#0fa497]" />
+                ATF increase
+              </div>
+              <ArrowRight className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+              <div className="bg-slate-50 rounded-xl px-3 py-2 text-xs font-medium text-slate-700 border border-slate-100 flex items-center gap-1.5">
+                <TrendingUp className="w-3.5 h-3.5 text-rose-500" />
+                Route-level fare increases detected
+              </div>
+              <ArrowRight className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+              <div className="bg-slate-50 rounded-xl px-3 py-2 text-xs font-medium text-slate-700 border border-slate-100 flex items-center gap-1.5">
+                <BarChart2 className="w-3.5 h-3.5 text-purple-500" />
+                Broader index movement observed
+              </div>
+            </div>
+          </div>
+          {/* Propagation time */}
+          <div className="bg-[#f0faf9] rounded-2xl p-4">
+            <div className="flex items-center gap-2 mb-1">
+              <Calendar className="w-4 h-4 text-[#0fa497]" />
+              <span className="text-xs text-slate-600">Observed Propagation Time</span>
+            </div>
+            <div className="text-2xl font-bold text-slate-900 mb-1">15 Days</div>
+            <p className="text-xs text-slate-500 mb-3">
+              Multiple route-level fare movements were observed following the selected external event.
+            </p>
+            <button
+              onClick={() => navigate('/shock-propagation')}
+              className="w-full flex items-center justify-center gap-2 py-2 px-4 bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold rounded-xl transition-colors"
+            >
+              Explore Shock Propagation <ArrowRight className="w-3.5 h-3.5" />
+            </button>
           </div>
         </div>
       </div>
