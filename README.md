@@ -1,8 +1,14 @@
-# ✈️ India Airfare Price Index & Airfare Intelligence Platform
+# ✈️ India Airfare Price Index — Intelligence Platform
 
 > **Smart India Hackathon 2026 — Ministry of Civil Aviation**
 >
-> A comprehensive analytics and intelligence dashboard that tracks, indexes, analyzes, and forecasts domestic airfare prices across India's aviation market.
+> A full-stack analytics and intelligence dashboard that tracks, indexes, analyzes, and forecasts domestic airfare prices across India's aviation market — with Clerk-powered authentication, protected routes, and real-time data visualization.
+
+[![React](https://img.shields.io/badge/React-19.2.8-61DAFB?logo=react)](https://react.dev)
+[![Vite](https://img.shields.io/badge/Vite-8.3.1-646CFF?logo=vite)](https://vitejs.dev)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind-3.4.19-38BDF8?logo=tailwindcss)](https://tailwindcss.com)
+[![Clerk](https://img.shields.io/badge/Auth-Clerk-6C47FF?logo=clerk)](https://clerk.com)
+[![License](https://img.shields.io/badge/License-SIH%202026-orange)](./LICENSE)
 
 ---
 
@@ -17,8 +23,7 @@ The **India Airfare Price Index (IAPI)** is a structured, data-driven intelligen
 - **Detects** anomalies and sudden price spikes across routes and airlines
 - **Forecasts** short-term fare movements using statistical modeling (T+1 to T+45 horizons)
 - **Visualizes** seasonal patterns, airline competition, and market dynamics
-
-This platform brings transparency and analytical rigor to India's airfare landscape — helping citizens travel smarter and enabling data-informed policy.
+- **Secures** access via Clerk authentication — dashboard is public, all analytics pages require login
 
 ---
 
@@ -36,9 +41,7 @@ India's aviation market suffers from:
 
 ---
 
-## 💡 Proposed Solution
-
-The IAPI platform ingests, processes, and analyzes airfare data across a 7-layer pipeline:
+## 💡 Solution Architecture
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────┐
@@ -68,84 +71,139 @@ The IAPI platform ingests, processes, and analyzes airfare data across a 7-layer
 
 ---
 
-## ✨ Key Features
+## 🔐 Authentication & Access Control
 
-### 📊 Dashboard
-- Live **Airfare Price Index** (composite metric — current: 128.4)
+This platform uses **[Clerk](https://clerk.com)** for authentication.
+
+### Access Rules
+
+| Page | Access |
+|---|---|
+| `/dashboard` | ✅ Public — visible to everyone without login |
+| `/route-explorer` | 🔒 Requires Clerk login |
+| `/airlines` | 🔒 Requires Clerk login |
+| `/seasonal-trends` | 🔒 Requires Clerk login |
+| `/forecast` | 🔒 Requires Clerk login |
+| `/reports` | 🔒 Requires Clerk login |
+| `/history` | 🔒 Requires Clerk login |
+| `/economic-impact` | 🔒 Requires Clerk login |
+| `/shock-propagation` | 🔒 Requires Clerk login |
+| `/anomaly-detection` | 🔒 Requires Clerk login |
+
+### Auth Flow
+
+```
+Open App
+   │
+   ▼
+Dashboard (public preview)
+   │
+   ▼ (click any protected page)
+Clerk Sign-In Modal
+   │
+   ▼ (after login)
+Protected Page Unlocked
+   │
+   ▼ (click Logout in sidebar)
+Confirmation Dialog → Sign Out → Dashboard
+```
+
+### Login Button
+- **Not signed in** → Blue "Login" button appears in the topbar
+- **Signed in** → Clerk `UserButton` (avatar + dropdown) appears in the topbar
+- **Logout** → Only visible in sidebar when signed in; clicking it shows a confirmation dialog before signing out
+
+### Environment Setup for Auth
+
+```bash
+cp .env.example .env.local
+# Fill in your Clerk keys from https://dashboard.clerk.com
+```
+
+```env
+VITE_CLERK_PUBLISHABLE_KEY=pk_test_your_key_here
+CLERK_SECRET_KEY=sk_test_your_key_here
+```
+
+> ⚠️ Never commit `.env.local` — it is excluded in `.gitignore`
+
+---
+
+## ✨ Features
+
+### 📊 Dashboard (Public)
+- Live **Airfare Price Index** composite metric (current: 128.4)
 - 6 KPI cards: routes tracked, airlines monitored, price spikes, data records, average fare, index trend
-- 7-day rolling index chart
-- Real-time **price spike table** with severity badges (High / Medium / Low)
-- Top airline pricing comparison
+- 7-day / 30-day / 1-year rolling index area chart (Recharts)
+- Real-time **price spike table** with severity badges
+- Top airline pricing comparison grid
 - Seasonal trend mini-chart and market forecast summary
+- Economic Impact, Anomaly Detection, Shock Propagation summary cards
+- Recent Intelligence Signals feed
 
-### 🗺️ Route Explorer
+### 🗺️ Route Explorer (Protected)
 - Search any origin–destination pair (e.g., Bhopal → Delhi)
-- View current price status (Normal / Elevated / Spike)
+- View current price status: Normal / Elevated / Spike
 - Quick insights: cheapest airline, peak season, booking window recommendation
 - Per-airline fare breakdown table for the selected route
 
-### 📈 Airline Analysis
+### 📈 Airline Analysis (Protected)
 - Detailed comparison of all monitored airlines
 - Filter by period, route, and sort order
 - Average fare, routes operated, and MoM change per airline
 - Airline-specific insight dossier modal
 - Summary metrics: cheapest, most expensive, most volatile, highest growth carrier
 
-### 🌦️ Seasonal Trends
+### 🌦️ Seasonal Trends (Protected)
 - Monthly average airfare heatmap (color-coded: green = low, orange = high)
 - Peak vs. off-peak period identification
 - Season-specific cards: Summer, Monsoon, Festival Season
 - Regional and route-level filtering
 
-### 📉 Market Forecast
-- **Forecast Horizons**: T+1 (next day), T+7 (1 week), T+15 (2 weeks), T+30 (1 month), T+45 (6 weeks)
+### 📉 Market Forecast (Protected)
+- Forecast Horizons: T+1, T+7, T+15, T+30, T+45
 - Route-specific outlook table
 - Market driver analysis (fuel costs, demand signals, capacity changes)
 - Airfare Outlook card with directional confidence rating
-- ⚠️ Disclaimer: Forecasts are estimates based on statistical models, not guarantees
 
-### 📋 Reports
-- Generate custom reports (Market Overview, Airline Comparison, Price Spike Alert, Seasonal Analysis)
-- Download/view pre-generated reports in PDF format _(planned)_
+### 📋 Reports (Protected)
+- Generate custom reports: Market Overview, Airline Comparison, Price Spike Alert, Seasonal Analysis
 - Latest report sidebar with key findings
 - Report type selection grid
 
-### 🕐 History
+### 🕐 History (Protected)
 - Search history with airline views and timestamps
-- Route re-search capability ("View Route Again")
+- Route re-search capability
 - Login activity audit log
+
+### 🧠 Intelligence Pages (Protected)
+- **Economic Impact** — ATF price vs airfare correlation analysis
+- **Shock Propagation** — How external shocks propagate through route-level fares to the national index
+- **Anomaly Detection** — Statistical classification of unusual fare movements
 
 ---
 
-## 📐 Airfare Price Index — Explained
-
-The **India Airfare Price Index (IAPI)** is a composite metric computed as:
+## 📐 Airfare Price Index — Methodology
 
 ```
 IAPI = (Σ Weighted Average Fare per Route) / (Base Year Average Fare) × 100
 ```
 
 - **Base Year**: 2020 (pre-COVID baseline)
-- **Weight**: Routes are weighted by passenger volume (higher traffic = higher weight)
-- **Frequency**: Computed daily from scraped/API-sourced fare data
-- **Interpretation**: Index > 100 means fares are above the base year baseline
+- **Weight**: Routes weighted by passenger volume
+- **Frequency**: Computed daily
+- **Interpretation**: Index > 100 = fares above base year
 
-### Current Index: **128.4**
-This means average domestic fares are currently **28.4% above** the 2020 base year level.
+### Current Index: 128.4
+Average domestic fares are currently **28.4% above** the 2020 baseline.
 
 ---
 
-## 🚨 Anomaly & Price Spike Detection
-
-The platform flags routes with abnormal fare increases using:
-
-- **Statistical Baseline**: 30-day rolling average per route
-- **Spike Threshold**: > 15% above baseline = **High Spike**, 8–15% = **Medium**, 5–8% = **Low**
-- **Alert System**: Spikes are surfaced on the dashboard in real-time
+## 🚨 Price Spike Detection
 
 | Severity | Threshold | Example |
 |---|---|---|
-| 🔴 High Spike | > 15% above baseline | Bhopal → Delhi +18.4% |
+| 🔴 High Spike | > 15% above 30-day baseline | Bhopal → Delhi +18.4% |
 | 🟠 Medium | 8–15% above baseline | Mumbai → Goa +12.1% |
 | 🟡 Low | 5–8% above baseline | Delhi → Bangalore +6.3% |
 
@@ -153,55 +211,53 @@ The platform flags routes with abnormal fare increases using:
 
 ## 🔮 Forecasting
 
-Fare forecasting is powered by **ARIMA (AutoRegressive Integrated Moving Average)** — a time-series statistical model suited for seasonal and trend data.
-
-### Forecast Horizons
+Powered by **ARIMA (AutoRegressive Integrated Moving Average)**:
 
 | Horizon | Label | Use Case |
 |---|---|---|
-| T+1 | Next Day | Last-minute booking decisions |
+| T+1 | Next Day | Last-minute booking |
 | T+7 | 1 Week | Short-trip planning |
-| T+15 | 2 Weeks | Standard advance booking window |
-| T+30 | 1 Month | Holiday and event travel planning |
+| T+15 | 2 Weeks | Standard advance booking |
+| T+30 | 1 Month | Holiday travel planning |
 | T+45 | 6 Weeks | Early-bird booking strategy |
 
-> **⚠️ Disclaimer**: All forecasts are statistical estimates based on historical patterns. They do not constitute financial or travel advice. Actual fares may vary significantly due to sudden demand changes, airline pricing decisions, or external events.
+> ⚠️ Forecasts are statistical estimates only. Not financial or travel advice.
 
 ---
 
 ## 🛠️ Technology Stack
 
-### Frontend (Current)
+### Frontend
 
 | Technology | Version | Purpose |
 |---|---|---|
 | React | 19.2.8 | UI component framework |
 | Vite | 8.3.1 | Build tool and dev server |
-| JavaScript (ES2022) | — | Primary language |
 | Tailwind CSS | 3.4.19 | Utility-first styling |
 | React Router DOM | 7.18.4 | Client-side routing |
-| Recharts | 3.10.1 | Data visualizations and charts |
+| Recharts | 3.10.1 | Data visualizations |
 | Lucide React | 1.48.0 | Icon system |
+| Clerk (`@clerk/react`) | 3.x | Authentication & user management |
 | clsx + tailwind-merge | — | Conditional class management |
 
-### Backend & Data _(Planned / Future Integration)_
+### Backend & Data _(Planned)_
 
 | Technology | Purpose |
 |---|---|
 | Node.js + Express | REST API server |
 | Python (FastAPI) | Data scraping and ML pipeline |
-| ARIMA / Prophet | Time-series forecasting models |
+| ARIMA / Prophet | Time-series forecasting |
 | PostgreSQL | Structured fare data storage |
-| Redis | Caching for real-time index computation |
-| Apache Airflow | Scheduled data ingestion pipeline |
+| Redis | Caching for real-time index |
+| Apache Airflow | Scheduled data ingestion |
 
-### Data Sources _(Planned / Future Integration)_
+### Data Sources _(Planned)_
 
 | Source | Type |
 |---|---|
-| DGCA (Directorate General of Civil Aviation) | Official traffic and route data |
-| Airline APIs (IndiGo, Air India, Akasa, SpiceJet) | Direct fare feeds |
-| OTA Integration (MakeMyTrip, Goibibo) | Market price aggregation |
+| DGCA | Official traffic and route data |
+| IndiGo, Air India, Akasa, SpiceJet APIs | Direct fare feeds |
+| MakeMyTrip, Goibibo | Market price aggregation |
 | BCAS Reports | Regulatory compliance data |
 
 ---
@@ -209,26 +265,21 @@ Fare forecasting is powered by **ARIMA (AutoRegressive Integrated Moving Average
 ## 🏗️ System Architecture
 
 ```
-┌─────────────────────────────────────────────────────────────────────────┐
-│                         IAPI SYSTEM ARCHITECTURE                        │
-└─────────────────────────────────────────────────────────────────────────┘
-
-  ┌──────────────┐     ┌──────────────┐     ┌──────────────────────────┐
-  │  Data Layer  │     │  API Layer   │     │     Frontend (React)     │
-  │              │     │              │     │                          │
-  │ PostgreSQL   │────►│  REST API    │────►│  DashboardLayout         │
-  │ Redis Cache  │     │  (Express /  │     │  ├── Sidebar (NavLink)   │
-  │ Raw Scraped  │     │   FastAPI)   │     │  ├── Topbar              │
-  │ Fare Data    │     │              │     │  └── Pages (7 routes)    │
-  └──────────────┘     └──────────────┘     │       ├── Dashboard      │
-                                             │       ├── RouteExplorer  │
-  ┌──────────────┐     ┌──────────────┐     │       ├── AirlineAnalysis│
-  │  ML Pipeline │     │  Index Calc  │     │       ├── SeasonalTrends │
-  │              │     │              │     │       ├── MarketForecast  │
-  │ ARIMA Model  │────►│  IAPI Score  │────►│       ├── Reports        │
-  │ Spike Detect │     │  Generator   │     │       └── History        │
-  │ Trend Engine │     │              │     └──────────────────────────┘
-  └──────────────┘     └──────────────┘
+┌──────────────┐     ┌──────────────┐     ┌──────────────────────────┐
+│  Data Layer  │     │  API Layer   │     │     Frontend (React)     │
+│              │     │              │     │                          │
+│ PostgreSQL   │────►│  REST API    │────►│  ClerkProvider           │
+│ Redis Cache  │     │  (Express)   │     │  └── App (BrowserRouter) │
+│ Raw Fare Data│     │              │     │      ├── /dashboard (pub)│
+└──────────────┘     └──────────────┘     │      ├── /airlines (auth)│
+                                           │      ├── /forecast (auth)│
+┌──────────────┐     ┌──────────────┐     │      └── ... (auth)     │
+│  ML Pipeline │     │  Index Calc  │     │                          │
+│              │     │              │     │  DashboardLayout         │
+│ ARIMA Model  │────►│  IAPI Score  │────►│  ├── Sidebar             │
+│ Spike Detect │     │  Generator   │     │  ├── Topbar              │
+│ Trend Engine │     │              │     │  └── <Outlet />          │
+└──────────────┘     └──────────────┘     └──────────────────────────┘
 ```
 
 ---
@@ -236,67 +287,65 @@ Fare forecasting is powered by **ARIMA (AutoRegressive Integrated Moving Average
 ## 📁 Project Structure
 
 ```
-airfare/
+AIRFARE-INDEX/
 ├── public/
+│   ├── favicon.svg
+│   └── icons.svg
 ├── src/
-│   ├── assets/               # Static assets (images, SVGs)
-│   │   ├── hero.png
-│   │   ├── react.svg
-│   │   └── vite.svg
-│   │
-│   ├── components/           # Reusable UI components
-│   │   ├── ActivityRow.jsx   # Audit log row component
-│   │   ├── AirlineLogo.jsx   # Custom SVG airline emblems
-│   │   ├── ChartCard.jsx     # Recharts wrapper with header/footer
-│   │   ├── DataTable.jsx     # Responsive sortable table
-│   │   ├── FilterBar.jsx     # Search + dropdown filter row
-│   │   ├── InsightCard.jsx   # Market advisory cards
-│   │   ├── KpiCard.jsx       # Large KPI metric cards
-│   │   ├── PageHeader.jsx    # Page title + badge + actions
-│   │   ├── Sidebar.jsx       # Navigation sidebar
-│   │   ├── StatCard.jsx      # Compact secondary metric cards
-│   │   ├── StatusBadge.jsx   # Colored severity/status pills
-│   │   └── Topbar.jsx        # Top navigation bar
-│   │
-│   ├── data/                 # Centralized mock data (swap with API)
-│   │   ├── airlines.js       # Airline details and pricing data
-│   │   ├── forecast.js       # Forecast horizons and market factors
-│   │   ├── history.js        # Search history and login activity
-│   │   ├── indexData.js      # Dashboard KPIs, spike list, trends
-│   │   ├── reports.js        # Report types and available reports
-│   │   ├── routeExplorer.js  # Route-specific fare data
-│   │   └── seasonal.js       # Monthly seasonal fare patterns
-│   │
+│   ├── assets/                   # Static assets
+│   ├── components/               # Reusable UI components
+│   │   ├── ActivityRow.jsx       # Audit log row
+│   │   ├── AirlineLogo.jsx       # Airline SVG emblems
+│   │   ├── ChartCard.jsx         # Recharts wrapper
+│   │   ├── DataTable.jsx         # Responsive sortable table
+│   │   ├── FilterBar.jsx         # Search + dropdown filters
+│   │   ├── InsightCard.jsx       # Market advisory cards
+│   │   ├── KpiCard.jsx           # Large KPI metric cards
+│   │   ├── PageHeader.jsx        # Page title + badge + actions
+│   │   ├── ProtectedRoute.jsx    # Auth guard (legacy, unused)
+│   │   ├── Sidebar.jsx           # Navigation sidebar w/ logout confirm
+│   │   ├── StatCard.jsx          # Compact metric cards
+│   │   ├── StatusBadge.jsx       # Severity/status pills
+│   │   └── Topbar.jsx            # Top bar w/ Login/UserButton
+│   ├── context/
+│   │   └── AuthContext.jsx       # Local auth context (legacy, unused)
+│   ├── data/                     # Centralized mock data
+│   │   ├── airlines.js
+│   │   ├── forecast.js
+│   │   ├── history.js
+│   │   ├── indexData.js
+│   │   ├── intelligence.js
+│   │   ├── reports.js
+│   │   ├── routeExplorer.js
+│   │   └── seasonal.js
 │   ├── layouts/
-│   │   └── DashboardLayout.jsx  # Shared layout: Sidebar + Topbar + Outlet
-│   │
-│   ├── pages/                # Top-level route pages
+│   │   └── DashboardLayout.jsx   # Sidebar + Topbar + Outlet shell
+│   ├── pages/
 │   │   ├── AirlineAnalysis.jsx
-│   │   ├── Dashboard.jsx
+│   │   ├── AnomalyDetection.jsx
+│   │   ├── Dashboard.jsx         # Public landing page
+│   │   ├── EconomicImpact.jsx
 │   │   ├── History.jsx
+│   │   ├── Login.jsx             # Legacy login page (unused)
 │   │   ├── MarketForecast.jsx
 │   │   ├── Reports.jsx
 │   │   ├── RouteExplorer.jsx
-│   │   └── SeasonalTrends.jsx
-│   │
+│   │   ├── SeasonalTrends.jsx
+│   │   └── ShockPropagation.jsx
 │   ├── services/
-│   │   └── api.js            # Async data fetching (mock → real API ready)
-│   │
+│   │   └── api.js                # Async data layer (mock → real API ready)
 │   ├── utils/
-│   │   └── formatters.js     # formatINR, formatNumber, formatPercent
-│   │
-│   ├── App.css               # Global app styles (minimal)
-│   ├── App.jsx               # BrowserRouter + Route definitions
-│   ├── index.css             # Tailwind directives + custom scrollbar
-│   └── main.jsx              # React root entry point
-│
-├── .env.example              # Environment variable template
-├── .gitignore                # Git ignore rules
-├── index.html                # Vite HTML entry + Inter font
+│   │   └── formatters.js         # formatINR, formatNumber, formatPercent
+│   ├── App.jsx                   # Route definitions + auth guards
+│   ├── index.css                 # Tailwind directives
+│   └── main.jsx                  # React root + ClerkProvider
+├── .env.example                  # Environment variable template
+├── .env.local                    # ⚠️ NOT committed — your real keys go here
+├── .gitignore
+├── index.html
 ├── package.json
 ├── postcss.config.js
-├── README.md
-├── tailwind.config.js        # Tailwind config with teal brand color
+├── tailwind.config.js
 └── vite.config.js
 ```
 
@@ -306,76 +355,80 @@ airfare/
 
 ### Prerequisites
 
-- **Node.js** v18 or higher ([Download](https://nodejs.org/))
-- **npm** v9 or higher (comes with Node.js)
-- **Git** ([Download](https://git-scm.com/))
+- **Node.js** v18+ — [Download](https://nodejs.org/)
+- **npm** v9+ (comes with Node.js)
+- **Git** — [Download](https://git-scm.com/)
+- **Clerk account** — [Sign up free](https://clerk.com)
 
 ### Steps
 
 ```bash
 # 1. Clone the repository
-git clone https://github.com/AlinaSheikh02/AIRFARE-INDEX.git
-cd AIRFARE-INDEX
+git clone https://github.com/ux01xourabh07/Air_Fair_System.git
+cd Air_Fair_System
 
 # 2. Install dependencies
 npm install
 
-# 3. Set up environment variables (optional — app works with mock data by default)
-cp .env.example .env
-# Edit .env if you have a real API backend
+# 3. Set up Clerk authentication
+cp .env.example .env.local
+# Edit .env.local and add your Clerk keys from https://dashboard.clerk.com
 
 # 4. Start the development server
 npm run dev
 ```
 
-The app will be available at **http://localhost:5173**
+Open **http://localhost:5173** in your browser.
 
 ### Build for Production
 
 ```bash
-npm run build
-# Output: dist/ directory — deploy to any static host (Vercel, Netlify, GitHub Pages)
-
-npm run preview  # Preview the production build locally
+npm run build       # Output: dist/ — deploy to Vercel, Netlify, GitHub Pages
+npm run preview     # Preview production build locally
 ```
 
 ---
 
 ## 🔐 Environment Variables
 
-Copy `.env.example` to `.env` and configure:
+Copy `.env.example` → `.env.local` and fill in your values:
 
-| Variable | Description | Default |
+| Variable | Description | Where to get |
 |---|---|---|
-| `VITE_API_URL` | Backend API base URL | _(empty — uses mock data)_ |
-| `VITE_APP_TITLE` | Application display title | `India Airfare Price Index` |
+| `VITE_CLERK_PUBLISHABLE_KEY` | Clerk publishable key (safe for frontend) | [Clerk Dashboard](https://dashboard.clerk.com) → API Keys |
+| `CLERK_SECRET_KEY` | Clerk secret key (backend only) | [Clerk Dashboard](https://dashboard.clerk.com) → API Keys |
 
-> **Note**: Never commit `.env` to version control. It is already excluded in `.gitignore`.
+> ⚠️ `CLERK_SECRET_KEY` should only be used server-side. Never expose it in client code.
+> ⚠️ `.env.local` is in `.gitignore` and will never be committed.
 
 ---
 
-## 🖥️ Usage
+## 🖥️ Usage Guide
 
-### Navigating the Platform
+### Navigation
 
-| Page | Route | Description |
-|---|---|---|
-| Dashboard | `/dashboard` | Live index, spikes, airline pricing overview |
-| Route Explorer | `/route-explorer` | Search a specific origin–destination route |
-| Airline Analysis | `/airlines` | Compare all airlines by fare and performance |
-| Seasonal Trends | `/seasonal-trends` | Monthly fare patterns and peak season analysis |
-| Market Forecast | `/forecast` | T+1 to T+45 fare predictions |
-| Reports | `/reports` | Generate and download intelligence reports |
-| History | `/history` | View past searches and login activity |
+| Page | Route | Auth | Description |
+|---|---|---|---|
+| Dashboard | `/dashboard` | Public | Live index, spikes, airline overview |
+| Route Explorer | `/route-explorer` | 🔒 Login | Search origin–destination fares |
+| Airline Analysis | `/airlines` | 🔒 Login | Compare all airlines |
+| Seasonal Trends | `/seasonal-trends` | 🔒 Login | Monthly fare patterns |
+| Market Forecast | `/forecast` | 🔒 Login | T+1 to T+45 predictions |
+| Reports | `/reports` | 🔒 Login | Generate intelligence reports |
+| History | `/history` | 🔒 Login | Search history and audit log |
+| Economic Impact | `/economic-impact` | 🔒 Login | ATF vs airfare correlation |
+| Shock Propagation | `/shock-propagation` | 🔒 Login | External shock analysis |
+| Anomaly Detection | `/anomaly-detection` | 🔒 Login | Unusual fare movement detection |
 
-### Workflow Example
+### Typical Workflow
 
-1. Open **Dashboard** → Check the current IAPI score and any active spike alerts
-2. Go to **Route Explorer** → Search your travel route (e.g., Delhi → Mumbai)
-3. Review the **price status**, cheapest airline, and booking window recommendation
-4. Open **Market Forecast** → Check T+7 / T+15 fare direction before booking
-5. Explore **Seasonal Trends** → Understand if your travel month is peak or off-peak
+1. Open **Dashboard** → Check current IAPI score and active spike alerts
+2. Click **Login** in the topbar → Sign in via Clerk
+3. Go to **Route Explorer** → Search your travel route
+4. Open **Market Forecast** → Check T+7 / T+15 fare direction
+5. Explore **Seasonal Trends** → Understand peak vs off-peak months
 6. Generate a **Report** → Export findings for sharing or policy reference
+7. Click **Logout** in sidebar → Confirm sign-out in the dialog
 
 ---
 
@@ -383,38 +436,46 @@ Copy `.env.example` to `.env` and configure:
 
 | Feature | Priority | Description |
 |---|---|---|
-| **Live Data Integration** | High | Connect to real airline APIs and OTA feeds |
-| **User Authentication** | High | JWT-based login with role-based access |
-| **Alert System** | High | Email/SMS notifications on spike detection |
-| **ML Forecasting Backend** | High | Deploy ARIMA / Prophet models via FastAPI |
-| **Mobile App** | Medium | React Native companion app for travelers |
-| **DGCA Data Integration** | Medium | Official route and traffic data ingestion |
-| **PDF Report Export** | Medium | Generate downloadable intelligence reports |
-| **Multi-language Support** | Low | Hindi and regional language UI |
-| **Public API** | Low | Open API for researchers and policymakers |
-| **Comparison Tool** | Low | Side-by-side fare comparison for dates |
+| Live Data Integration | High | Connect to real airline APIs and OTA feeds |
+| ML Forecasting Backend | High | Deploy ARIMA / Prophet models via FastAPI |
+| Alert System | High | Email/SMS notifications on spike detection |
+| PDF Report Export | Medium | Downloadable intelligence reports |
+| Mobile App | Medium | React Native companion app |
+| DGCA Data Integration | Medium | Official route and traffic data |
+| Multi-language Support | Low | Hindi and regional language UI |
+| Public API | Low | Open API for researchers and policymakers |
 
 ---
 
-## ⚖️ Disclaimer & Data Usage
+## 🤝 Contributing
 
-> **Data Accuracy**: The current version of this platform operates on **structured mock data** that mirrors real-world airfare patterns. It does not reflect actual live fares from any airline or booking platform.
->
-> **Forecasting Disclaimer**: All fare forecasts are produced by statistical models (ARIMA) trained on historical patterns. They are **estimates only** and should not be used as financial or travel planning advice. Actual market conditions may differ significantly.
->
-> **No Commercial Affiliation**: This project has no commercial relationship with any airline, OTA, or booking platform. Airline names and logos are referenced for educational and analytical purposes only.
->
-> **SIH Context**: This platform was built as a proof-of-concept for Smart India Hackathon 2026. All data pipelines and ML integrations are planned future work.
+1. Fork the repository
+2. Create a feature branch: `git checkout -b feature/your-feature`
+3. Commit your changes: `git commit -m "feat: add your feature"`
+4. Push to the branch: `git push origin feature/your-feature`
+5. Open a Pull Request
 
 ---
 
-## 👥 Contributors
+## ⚖️ Disclaimer
 
-**SIH 2026 Team — India Airfare Intelligence**
+> **Mock Data**: The current version operates on structured mock data mirroring real-world airfare patterns. It does not reflect actual live fares.
+>
+> **Forecasting**: All fare forecasts are statistical estimates based on historical patterns. Not financial or travel advice.
+>
+> **No Commercial Affiliation**: No commercial relationship with any airline, OTA, or booking platform. Airline names referenced for educational purposes only.
+>
+> **SIH Context**: Built as a proof-of-concept for Smart India Hackathon 2026.
+
+---
+
+## 👥 Team
+
+**SIH 2026 — India Airfare Intelligence**
 
 | Name | Role |
 |---|---|
-| Alina Sheikh | Lead Developer & UI/UX |
+| Sourabh | Lead Developer & UI/UX |
 | _(Team Member)_ | Data Engineering |
 | _(Team Member)_ | ML / Forecasting |
 | _(Team Member)_ | Backend API |
@@ -424,7 +485,7 @@ Copy `.env.example` to `.env` and configure:
 
 ## 📄 License
 
-This project is developed for **Smart India Hackathon 2026** under the guidance of the **Ministry of Civil Aviation, Government of India**.
+Developed for **Smart India Hackathon 2026** under the guidance of the **Ministry of Civil Aviation, Government of India**.
 
 For academic and demonstration purposes only.
 
@@ -433,5 +494,8 @@ For academic and demonstration purposes only.
 <div align="center">
   <strong>✈️ India Airfare Price Index Platform</strong><br/>
   Smart India Hackathon 2026 &nbsp;|&nbsp; Ministry of Civil Aviation<br/>
-  <em>Built with React + Vite + Tailwind CSS</em>
+  <em>React · Vite · Tailwind CSS · Clerk Auth · Recharts</em><br/><br/>
+  <a href="https://github.com/ux01xourabh07/Air_Fair_System">GitHub</a> &nbsp;|&nbsp;
+  <a href="https://dashboard.clerk.com">Clerk Dashboard</a> &nbsp;|&nbsp;
+  <a href="https://clerk.com/docs">Clerk Docs</a>
 </div>
