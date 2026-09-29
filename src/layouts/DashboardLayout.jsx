@@ -3,6 +3,7 @@ import { Outlet, useNavigate } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
 import Topbar from '../components/Topbar';
 import { X, CheckCircle, Sliders, Save } from 'lucide-react';
+import { useClerk } from '@clerk/react';
 
 export const DashboardLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -17,11 +18,10 @@ export const DashboardLayout = () => {
     }, 3000);
   };
 
+  const { signOut } = useClerk();
+
   const handleLogout = () => {
-    showToast('Logged out successfully.', 'info');
-    setTimeout(() => {
-      navigate('/dashboard');
-    }, 1000);
+    signOut({ redirectUrl: '/' });
   };
 
   const handleGlobalSearch = (query) => {

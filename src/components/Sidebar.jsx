@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import {
   LayoutDashboard,
@@ -16,8 +16,12 @@ import {
   Activity,
   AlertTriangle,
 } from 'lucide-react';
+import { useClerk, useAuth } from '@clerk/react';
 
 export const Sidebar = ({ isOpen, onClose, onOpenSettings, onLogout }) => {
+  const { signOut } = useClerk();
+  const { isSignedIn } = useAuth();
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   // MAIN section
   const mainNavItems = [
     { name: 'Dashboard', to: '/dashboard', icon: LayoutDashboard },
@@ -173,17 +177,51 @@ export const Sidebar = ({ isOpen, onClose, onOpenSettings, onLogout }) => {
             <span>Help & Support</span>
           </button>
 
-          <div className="pt-2">
-            <button
-              onClick={onLogout}
-              className="w-full flex items-center gap-3 px-4 py-2 rounded-xl text-sm font-medium text-slate-700 bg-slate-50 hover:bg-slate-100 transition-colors"
-            >
-              <LogOut className="w-4 h-4 text-slate-500" />
-              <span>Logout</span>
-            </button>
-          </div>
+          {/* Logout — only when signed in */}
+          {isSignedIn && (
+            <div className="pt-2">
+              <button
+                onClick={() => setShowLogoutConfirm(true)}
+                className="w-full flex items-center gap-3 px-4 py-2 rounded-xl text-sm font-medium text-slate-700 bg-slate-50 hover:bg-rose-50 hover:text-rose-600 transition-colors"
+              >
+                <LogOut className="w-4 h-4" />
+                <span>Logout</span>
+              </button>
+            </div>
+          )}
         </div>
       </aside>
+
+      {/* Logout Confirmation Modal */}
+      {showLogoutConfirm && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm">
+          <div className="bg-white rounded-2xl shadow-xl border border-slate-100 w-full max-w-sm p-6">
+            <div className="flex items-center gap-3 mb-3">
+              <div className="w-10 h-10 rounded-full bg-rose-50 flex items-center justify-center shrink-0">
+                <LogOut className="w-5 h-5 text-rose-500" />
+              </div>
+              <div>
+                <div className="font-bold text-slate-900 text-base">Confirm Logout</div>
+                <div className="text-xs text-slate-500">Are you sure you want to sign out?</div>
+              </div>
+            </div>
+            <div className="flex gap-2 mt-5">
+              <button
+                onClick={() => setShowLogoutConfirm(false)}
+                className="flex-1 py-2 rounded-xl text-sm font-medium text-slate-600 bg-slate-100 hover:bg-slate-200 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => { setShowLogoutConfirm(false); signOut({ redirectUrl: '/' }); }}
+                className="flex-1 py-2 rounded-xl text-sm font-semibold text-white bg-rose-500 hover:bg-rose-600 transition-colors"
+              >
+                Yes, Logout
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 };

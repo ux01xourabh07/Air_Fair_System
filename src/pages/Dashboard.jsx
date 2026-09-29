@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, useOutletContext } from 'react-router-dom';
+import { useUser } from '@clerk/react';
 import {
   TrendingUp,
   AlertTriangle,
@@ -50,6 +51,14 @@ export const Dashboard = () => {
   const navigate = useNavigate();
   const outletContext = useOutletContext();
   const showToast = outletContext?.showToast || console.log;
+  const { user } = useUser();
+
+  const greeting = (() => {
+    const h = new Date().getHours();
+    if (h < 12) return 'Good Morning';
+    if (h < 17) return 'Good Afternoon';
+    return 'Good Evening';
+  })();
 
   const [activeTimeframe, setActiveTimeframe] = useState('7D');
   const [routeSearchOrigin, setRouteSearchOrigin] = useState('Bhopal (BHO)');
@@ -78,8 +87,8 @@ export const Dashboard = () => {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 pt-1">
         <div>
           <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight flex items-center gap-2">
-            <span>Good Evening, Alina</span>
-            <span className="text-xl">☀️</span>
+            <span>{greeting}, {user?.firstName ?? 'Admin'}</span>
+            <span className="text-xl">✈️</span>
           </h1>
           <p className="text-sm text-slate-500 mt-1">
             Here's your latest airfare overview for India.
