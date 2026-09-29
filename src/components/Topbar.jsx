@@ -7,11 +7,12 @@ import {
   ChevronDown,
   LogIn,
 } from 'lucide-react';
-import { UserButton, useAuth, useClerk } from '@clerk/react';
+import { UserButton, useAuth } from '@clerk/react';
+import { useNavigate } from 'react-router-dom';
 
 export const Topbar = ({ onMenuClick, onSearchGlobal }) => {
   const { isSignedIn } = useAuth();
-  const { openSignIn } = useClerk();
+  const navigate = useNavigate();
   const [showNotifications, setShowNotifications] = useState(false);
   const [showDateMenu, setShowDateMenu] = useState(false);
   const [selectedDate, setSelectedDate] = useState('21 Sep 2026');
@@ -131,7 +132,7 @@ export const Topbar = ({ onMenuClick, onSearchGlobal }) => {
           <UserButton afterSignOutUrl="/" />
         ) : (
           <button
-            onClick={() => openSignIn()}
+            onClick={() => navigate('/sign-in')}
             className="flex items-center gap-2 px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-xl shadow-sm transition-colors"
           >
             <LogIn className="w-3.5 h-3.5" />

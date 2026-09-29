@@ -1,6 +1,6 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { useAuth, RedirectToSignIn } from '@clerk/react';
+import { useAuth, SignIn, SignUp } from '@clerk/react';
 import DashboardLayout from './layouts/DashboardLayout';
 import Dashboard from './pages/Dashboard';
 import AirlineAnalysis from './pages/AirlineAnalysis';
@@ -13,10 +13,12 @@ import EconomicImpact from './pages/EconomicImpact';
 import ShockPropagation from './pages/ShockPropagation';
 import AnomalyDetection from './pages/AnomalyDetection';
 
+const authPageStyle = "min-h-screen bg-[#f0f7ff] flex items-center justify-center p-4";
+
 function RequireAuth({ children }) {
   const { isSignedIn, isLoaded } = useAuth();
   if (!isLoaded) return null;
-  if (!isSignedIn) return <RedirectToSignIn />;
+  if (!isSignedIn) return <Navigate to="/sign-in" replace />;
   return children;
 }
 
@@ -24,12 +26,28 @@ export function App() {
   return (
     <BrowserRouter>
       <Routes>
+        {/* Clerk embedded auth pages */}
+        <Route
+          path="/sign-in/*"
+          element={
+            <div className={authPageStyle}>
+              <SignIn routing="path" path="/sign-in" fallbackRedirectUrl="/dashboard" />
+            </div>
+          }
+        />
+        <Route
+          path="/sign-up/*"
+          element={
+            <div className={authPageStyle}>
+              <SignUp routing="path" path="/sign-up" fallbackRedirectUrl="/dashboard" />
+            </div>
+          }
+        />
+
+        {/* Dashboard shell */}
         <Route path="/" element={<DashboardLayout />}>
-          {/* Public: dashboard */}
           <Route index element={<Navigate to="/dashboard" replace />} />
           <Route path="dashboard" element={<Dashboard />} />
-
-          {/* Protected: all other pages */}
           <Route path="route-explorer" element={<RequireAuth><RouteExplorer /></RequireAuth>} />
           <Route path="airlines" element={<RequireAuth><AirlineAnalysis /></RequireAuth>} />
           <Route path="seasonal-trends" element={<RequireAuth><SeasonalTrends /></RequireAuth>} />
