@@ -87,7 +87,7 @@ export const Dashboard = () => {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 pt-1">
         <div>
           <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight flex items-center gap-2">
-            <span>{greeting}, {user?.firstName ?? 'Admin'}</span>
+            <span>{greeting}, {user?.firstName ?? user?.fullName ?? 'User'}</span>
             <span className="text-xl">✈️</span>
           </h1>
           <p className="text-sm text-slate-500 mt-1">
